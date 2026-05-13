@@ -1,12 +1,6 @@
-/* =========================
-   SIMPLE 2-TAB VERSION
-   Opens ONLY 2 tabs
-   ONLY after a user click
-   NEVER spawns more
-========================= */
-
 /* Prevent multiple activations */
 let tabsOpened = false;
+let popups = [];
 
 /* Optional audio setup */
 document.addEventListener('click', musicPlay);
@@ -15,9 +9,7 @@ function musicPlay() {
     var audio = document.getElementById('youare-audio');
     var micon = document.getElementById('youare-micon');
 
-    /* Toggle music if elements exist */
     if (audio && micon) {
-
         if (audio.duration > 0 && audio.paused) {
             audio.play();
             micon.src = "images/speaker.png";
@@ -28,10 +20,9 @@ function musicPlay() {
         }
     }
 
-    /* Open tabs ONCE */
+    /* Open popups ONCE */
     openTwoTabs();
 
-    /* Remove click listener so it never repeats */
     document.removeEventListener('click', musicPlay);
 }
 
@@ -39,7 +30,6 @@ function musicPlay() {
 var faudio = new Audio('youare.mp3');
 
 faudio.addEventListener('timeupdate', function () {
-
     if (this.currentTime > this.duration - 0.45) {
         this.currentTime = 0;
         this.play();
@@ -47,25 +37,77 @@ faudio.addEventListener('timeupdate', function () {
 });
 
 /* Open popup window */
-function openWindow(url) {
+function openWindow(url, x, y) {
+    const width = 357;
+    const height = 330;
 
     return window.open(
         url,
         "_blank",
-        "menubar=no,status=no,toolbar=no,resizable=yes,width=357,height=330"
+        `menubar=no,status=no,toolbar=no,resizable=yes,
+        width=${width},height=${height},
+        left=${x},top=${y}`
     );
 }
 
-/* ONLY opens 2 tabs total */
+/* Open 4 bouncing popups */
 function openTwoTabs() {
-
-    /* Stop repeats */
     if (tabsOpened) return;
-
     tabsOpened = true;
 
-    openWindow('lol.html');
-    openWindow('lol.html');
+    const width = 357;
+    const height = 330;
+
+    for (let i = 0; i < 4; i++) {
+
+        let x = Math.random() * (screen.width - width);
+        let y = Math.random() * (screen.height - height);
+
+        let dx = (Math.random() * 6 + 3) * (Math.random() < 0.5 ? 1 : -1);
+        let dy = (Math.random() * 6 + 3) * (Math.random() < 0.5 ? 1 : -1);
+
+        let win = openWindow("lol.html", x, y);
+
+        popups.push({
+            win,
+            x,
+            y,
+            dx,
+            dy,
+            width,
+            height
+        });
+    }
+
+    startBouncing();
+}
+
+/* DVD-style bouncing movement */
+function startBouncing() {
+    setInterval(() => {
+
+        popups.forEach(p => {
+            if (!p.win || p.win.closed) return;
+
+            p.x += p.dx;
+            p.y += p.dy;
+
+            if (p.x <= 0 || p.x + p.width >= screen.width) {
+                p.dx *= -1;
+            }
+
+            if (p.y <= 0 || p.y + p.height >= screen.height) {
+                p.dy *= -1;
+            }
+
+            try {
+                p.win.moveTo(p.x, p.y);
+            } catch (e) {
+                // ignored (browser restrictions)
+            }
+        });
+
+    }, 20);
 }
 
 /* Optional title changer */
@@ -75,15 +117,12 @@ function changeTitle(title) {
 
 /* Optional bookmark function */
 function bookmark() {
-
     if (
         navigator.appName == "Microsoft Internet Explorer" &&
         parseInt(navigator.appVersion) >= 4
     ) {
-
         var url = "lol.html";
         var title = "Idiot!";
-
         window.external.AddFavorite(url, title);
     }
 }
@@ -93,9 +132,8 @@ window.oncontextmenu = function () {
     return false;
 };
 
-/* Optional keyboard prank */
+/* Removed keyboard UwU alert */
 window.onkeydown = function (event) {
-
     var keyCode = event.keyCode;
 
     if (
@@ -104,22 +142,16 @@ window.onkeydown = function (event) {
         keyCode == 46 ||
         keyCode == 115
     ) {
-
-        alert("UwU");
+        console.log("Key blocked");
     }
 
     return null;
 };
 
-/* Optional leave warning */
-window.onbeforeunload = function () {
-    return "UwU";
-};
+/* Removed beforeunload warning */
 
 /* Startup */
 window.onload = function () {
-
     bookmark();
-
     return true;
 };
