@@ -41,17 +41,23 @@ function openWindow(x, y) {
     const win = window.open(
         "lol.html",
         "_blank",
-        `menubar=no,status=no,toolbar=no,resizable=yes,
-        width=${width},height=${height},
-        left=${x},top=${y}`
+        `menubar=no,status=no,toolbar=no,resizable=yes,width=${width},height=${height}`
     );
 
-    if (win) popups.push(win);
+    if (!win) return null;
+
+    popups.push(win);
+
+    // IMPORTANT: move AFTER opening (this is the fix)
+    try {
+        win.moveTo(x, y);
+    } catch (e) {}
+
     trackPopup(win);
     return win;
 }
 
-/* Track and respawn on close (4 at a time) */
+/* Track and respawn */
 function trackPopup(win) {
     const checker = setInterval(() => {
         if (!win || win.closed) {
@@ -61,7 +67,7 @@ function trackPopup(win) {
     }, 1000);
 }
 
-/* Spawn multiple popups at better random screen positions */
+/* Spawn multiple popups properly distributed */
 function spawnPopups(count) {
     const width = 357;
     const height = 330;
@@ -80,22 +86,23 @@ function spawnPopups(count) {
     }
 }
 
-/* Initial 4 popups */
+/* Initial popups */
 function openInitialTabs() {
     spawnPopups(4);
 }
 
-/* Close all popups */
+/* Close all popups (FIXED to reuse same logic style) */
 function closeAllPopups() {
     popups.forEach(win => {
         try {
-            if (win && !win.closed) {
-                win.close();
-            }
+            if (win && !win.closed) win.close();
         } catch (e) {}
     });
 
     popups = [];
+
+    // optional: restart clean state if you want
+    // spawnPopups(4);
 }
 
 /* Keyboard shortcut: Ctrl + P */
@@ -111,7 +118,7 @@ function changeTitle(title) {
     document.title = title;
 }
 
-/* Optional bookmark function */
+/* Optional bookmark */
 function bookmark() {
     if (
         navigator.appName == "Microsoft Internet Explorer" &&
@@ -121,7 +128,7 @@ function bookmark() {
     }
 }
 
-/* Disable right click (optional) */
+/* Disable right click */
 window.oncontextmenu = function () {
     return false;
 };
