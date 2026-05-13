@@ -1,177 +1,125 @@
-/* [Oct 2021] Added to comply with strict browser policies. */
+/* =========================
+   SIMPLE 2-TAB VERSION
+   Opens ONLY 2 tabs
+   ONLY after a user click
+   NEVER spawns more
+========================= */
+
+/* Prevent multiple activations */
+let tabsOpened = false;
+
+/* Optional audio setup */
 document.addEventListener('click', musicPlay);
 
 function musicPlay() {
     var audio = document.getElementById('youare-audio');
-	var micon = document.getElementById('youare-micon');
-	
-	micon.addEventListener('click', musicPlay);
-	
-	if (audio.duration > 0 && audio.paused) {
-		audio.play();
-		micon.src = "images/speaker.png";
-	}
-	else {
-		audio.pause();
-		audio.currentTime = 0;
-		
-		micon.src = "images/speakerm.png";
-	}
-	
-	document.removeEventListener('click', musicPlay);
+    var micon = document.getElementById('youare-micon');
+
+    /* Toggle music if elements exist */
+    if (audio && micon) {
+
+        if (audio.duration > 0 && audio.paused) {
+            audio.play();
+            micon.src = "images/speaker.png";
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
+            micon.src = "images/speakerm.png";
+        }
+    }
+
+    /* Open tabs ONCE */
+    openTwoTabs();
+
+    /* Remove click listener so it never repeats */
+    document.removeEventListener('click', musicPlay);
 }
 
-var faudio = new Audio('youare.mp3')
+/* Looping background audio */
+var faudio = new Audio('youare.mp3');
 
-faudio.addEventListener('timeupdate', function() {
-	console.log('TimeUpdate invoked.');
+faudio.addEventListener('timeupdate', function () {
 
-    if (this.currentTime > this.duration - .45) {
+    if (this.currentTime > this.duration - 0.45) {
         this.currentTime = 0;
         this.play();
     }
-}
-);
-/* [Oct 2021] End part. */
+});
 
-function bookmark() {
-	if ((navigator.appName == "Microsoft Internet Explorer") && (parseInt(navigator.appVersion) >= 4)) {
-		var url = "lol.html";
-		var title = "Idiot!";
-		
-		window.external.AddFavorite(url, title);
-	}
-}
-
-var xOff = 5;
-var yOff = 5;
-var xPos = 400;
-var yPos = -100;
-var flagRun = 1;
-
-function changeTitle(title) {
-	document.title = title;
-}
-
+/* Open popup window */
 function openWindow(url) {
-	aWindow = window.open(url, "_blank", 'menubar=no, status=no, toolbar=no, resizable=no, width=357, height=330, titlebar=no, alwaysRaised=yes');
+
+    return window.open(
+        url,
+        "_blank",
+        "menubar=no,status=no,toolbar=no,resizable=yes,width=357,height=330"
+    );
 }
 
-function proCreate() {	
-	for (var i = 0; i < 5; i++) {
-		openWindow('lol.html');
-	}
+/* ONLY opens 2 tabs total */
+function openTwoTabs() {
+
+    /* Stop repeats */
+    if (tabsOpened) return;
+
+    tabsOpened = true;
+
+    openWindow('lol.html');
+    openWindow('lol.html');
 }
 
-function newXlt() {
-	xOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-	window.focus();
+/* Optional title changer */
+function changeTitle(title) {
+    document.title = title;
 }
 
-function newXrt() {
-	xOff = Math.ceil(7 * Math.random())  * 5 - 10;
-	window.focus();
-}
+/* Optional bookmark function */
+function bookmark() {
 
-function newYup() {
-	yOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-	window.focus();
-}
+    if (
+        navigator.appName == "Microsoft Internet Explorer" &&
+        parseInt(navigator.appVersion) >= 4
+    ) {
 
-function newYdn() {
-	yOff = Math.ceil( 7 * Math.random()) * 5 - 10;
-	window.focus();
-}
+        var url = "lol.html";
+        var title = "Idiot!";
 
-function fOff(){
-	flagRun = 0;
-}
-
-function playBall() {
-    xPos += xOff;
-    yPos += yOff;
-    
-	if (xPos > screen.width - 357) newXlt();    
-	if (xPos < 0) newXrt();
-    
-	if (yPos > screen.height - 330) newYup(); 		
-	if (yPos < 0) newYdn();
-    
-	if (flagRun == 1) {
-        window.moveTo(xPos, yPos);
-        setTimeout('playBall()', 1);
+        window.external.AddFavorite(url, title);
     }
 }
 
-/* [Oct 2021] Better code. */
-window.onload = function () {
-	flagRun = 1;
-	
-	playBall();
-	bookmark(); // Internet Explorer only (what a piece of sugar)
-	
-	return true;
-}
-
-window.onmouseout = function () {
-	proCreate();
-
-	return null;
+/* Disable right click (optional) */
+window.oncontextmenu = function () {
+    return false;
 };
 
-window.oncontextmenu = function() {
-	
-	return false;
-}
+/* Optional keyboard prank */
+window.onkeydown = function (event) {
 
-window.onkeydown = function() {	
-	var keyCode = event.keyCode;
-	
-	if (keyCode == 17 || keyCode == 18 || keyCode == 46 || keyCode == 115) {	
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");	
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("!"); 
-    alert("!"); 
-    alert("!"); 
-    alert("!"); 
-		proCreate();
-	}
-	
-	return null;
-}
+    var keyCode = event.keyCode;
 
-window.onbeforeunload = function() {
+    if (
+        keyCode == 17 ||
+        keyCode == 18 ||
+        keyCode == 46 ||
+        keyCode == 115
+    ) {
+
+        alert("UwU");
+    }
+
+    return null;
+};
+
+/* Optional leave warning */
+window.onbeforeunload = function () {
     return "UwU";
 };
-/* [Oct 2021] End of amendments. */l
+
+/* Startup */
+window.onload = function () {
+
+    bookmark();
+
+    return true;
+};
