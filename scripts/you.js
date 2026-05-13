@@ -61,14 +61,20 @@ function trackPopup(win) {
     }, 1000);
 }
 
-/* Spawn multiple popups at random positions */
+/* Spawn multiple popups at better random screen positions */
 function spawnPopups(count) {
     const width = 357;
     const height = 330;
 
+    const screenX = window.screenX || window.screenLeft;
+    const screenY = window.screenY || window.screenTop;
+
+    const outerW = window.outerWidth;
+    const outerH = window.outerHeight;
+
     for (let i = 0; i < count; i++) {
-        let x = Math.random() * (screen.width - width);
-        let y = Math.random() * (screen.height - height);
+        const x = Math.floor(screenX + Math.random() * (outerW - width));
+        const y = Math.floor(screenY + Math.random() * (outerH - height));
 
         openWindow(x, y);
     }
