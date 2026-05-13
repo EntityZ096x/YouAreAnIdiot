@@ -46,37 +46,59 @@ function openWindow(x, y) {
         left=${x},top=${y}`
     );
 
+    if (win) popups.push(win);
     trackPopup(win);
     return win;
 }
 
-/* Track and respawn on close */
+/* Track and respawn on close (4 at a time) */
 function trackPopup(win) {
     const checker = setInterval(() => {
         if (!win || win.closed) {
             clearInterval(checker);
-            spawnOnePopup();
+            spawnPopups(4);
         }
     }, 1000);
 }
 
-/* Spawn one popup at random position */
-function spawnOnePopup() {
+/* Spawn multiple popups at random positions */
+function spawnPopups(count) {
     const width = 357;
     const height = 330;
 
-    let x = Math.random() * (screen.width - width);
-    let y = Math.random() * (screen.height - height);
+    for (let i = 0; i < count; i++) {
+        let x = Math.random() * (screen.width - width);
+        let y = Math.random() * (screen.height - height);
 
-    openWindow(x, y);
+        openWindow(x, y);
+    }
 }
 
 /* Initial 4 popups */
 function openInitialTabs() {
-    for (let i = 0; i < 4; i++) {
-        spawnOnePopup();
-    }
+    spawnPopups(4);
 }
+
+/* Close all popups */
+function closeAllPopups() {
+    popups.forEach(win => {
+        try {
+            if (win && !win.closed) {
+                win.close();
+            }
+        } catch (e) {}
+    });
+
+    popups = [];
+}
+
+/* Keyboard shortcut: Ctrl + P */
+document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        closeAllPopups();
+    }
+});
 
 /* Optional title changer */
 function changeTitle(title) {
